@@ -8,12 +8,15 @@ class GameWindow < Gosu::Window
 		super(WIDTH, HEIGHT, false)
 		self.caption = 'Hello world'
 		@starfighter = StarFighter.new self
-		@bullet = nil
+		@bullets = []
 	end
 
 	def draw
 		@starfighter.draw
-		@bullet.draw if @bullet
+		for bullet in @bullets
+			bullet.draw
+		end
+		puts "Number of Bullets: #{@bullets.count}"
 	end
 
 	def update
@@ -27,11 +30,14 @@ class GameWindow < Gosu::Window
 			@starfighter.rotate 3
 		end
 		if button_down? Gosu::KbSpace
-			@bullet = Bullet.new self, @starfighter.x, @starfighter.y, @starfighter.rotation
+			bullet = Bullet.new self, @starfighter.x, @starfighter.y, @starfighter.rotation
+			@bullets.push bullet
 		end
 
 		@starfighter.move
-		@bullet.move if @bullet
+		for bullet in @bullets
+			bullet.move
+		end
 	end
 
 	def button_down(id)
@@ -77,7 +83,7 @@ class StarFighter
 end
 
 class Bullet
-	MOVEMENT = 50
+	MOVEMENT = 12
 
 	def initialize window, x, y, rotation
 		@x, @y, @rotation = x, y, rotation
