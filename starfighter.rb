@@ -9,6 +9,12 @@ class GameWindow < Gosu::Window
 		self.caption = 'Hello world'
 		@starfighter = StarFighter.new self
 		@bullets = []
+
+		@asteroids = []
+		(1..10).each do |i|
+			asteroid = Asteroid.new self
+			@asteroids.push asteroid
+		end
 	end
 
 	def draw
@@ -16,12 +22,16 @@ class GameWindow < Gosu::Window
 		for bullet in @bullets
 			bullet.draw
 		end
+
+		for asteroid in @asteroids
+			asteroid.draw
+		end
 		puts "Number of Bullets: #{@bullets.count}"
 	end
 
 	def update
 		if button_down? Gosu::KbUp
-			@starfighter.accelerate 15
+			@starfighter.accelerate 5
 		end
 		if button_down? Gosu::KbLeft
 			@starfighter.rotate -3
@@ -41,6 +51,11 @@ class GameWindow < Gosu::Window
 				@bullets.delete(bullet)
 			end
 		end
+
+		@asteroids.each do |asteroid|  asteroid.move end
+		# for asteroid in @asteroids
+		# 	asteroid.move
+		# end
 	end
 
 	def button_down(id)
@@ -100,12 +115,37 @@ class Bullet
 
 	def draw
 		color = Gosu::Color.new 0xffff8888
-		@window.draw_quad(@x, @y, color, @x + 5, @y, color, @x + 5, @y + 5, color, @x, @y + 5, color)
+		size = 5
+		@window.draw_quad(@x, @y, color, @x + size, @y, color, @x + size, @y + size, color, @x, @y + size, color)
 		# puts "Drawing Quad: #{@x} #{@y}"
 	end
 
 	def is_offscreen?
 		return true if @x < 0 or @x > @window.width or @y < 0 or @y > @window.height else false
+	end
+end
+
+class Asteroid
+	SIZE = 20
+
+	def initialize window
+		@x = rand window.width
+		@y = rand window.height
+		@rotation = rand 360
+		@movement = rand 5
+		@window = window
+	end
+	
+	def move
+		@x += Gosu::offset_x(@rotation, @movement)
+		@y += Gosu::offset_y(@rotation, @movement)
+		@x %= @window.width
+		@y %= @window.height
+	end
+
+	def draw
+		color = Gosu::Color.new 0x22228888
+		@window.draw_quad(@x, @y, color, @x + SIZE, @y, color, @x + SIZE, @y + SIZE, color, @x, @y + SIZE, color)
 	end
 end
 
