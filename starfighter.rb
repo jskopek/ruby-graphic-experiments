@@ -37,6 +37,9 @@ class GameWindow < Gosu::Window
 		@starfighter.move
 		for bullet in @bullets
 			bullet.move
+			if bullet.is_offscreen?
+				@bullets.remove(bullet)
+			end
 		end
 	end
 
@@ -99,6 +102,10 @@ class Bullet
 		color = Gosu::Color.new 0xffff8888
 		@window.draw_quad(@x, @y, color, @x + 5, @y, color, @x + 5, @y + 5, color, @x, @y + 5, color)
 		# puts "Drawing Quad: #{@x} #{@y}"
+	end
+
+	def is_offscreen?
+		return true if @x < 0 or @x > @window.width or @y < 0 or @y > @window.height else false
 	end
 end
 
