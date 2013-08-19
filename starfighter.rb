@@ -38,7 +38,7 @@ class GameWindow < Gosu::Window
 		for bullet in @bullets
 			bullet.move
 			if bullet.is_offscreen?
-				@bullets.remove(bullet)
+				@bullets.delete(bullet)
 			end
 		end
 	end
