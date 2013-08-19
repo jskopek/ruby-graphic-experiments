@@ -8,10 +8,12 @@ class GameWindow < Gosu::Window
 		super(WIDTH, HEIGHT, false)
 		self.caption = 'Hello world'
 		@starfighter = StarFighter.new self
+		@bullet = nil
 	end
 
 	def draw
 		@starfighter.draw
+		@bullet.draw if @bullet
 	end
 
 	def update
@@ -24,17 +26,24 @@ class GameWindow < Gosu::Window
 		if button_down? Gosu::KbRight
 			@starfighter.rotate 3
 		end
+		if button_down? Gosu::KbSpace
+			@bullet = Bullet.new self, @starfighter.x, @starfighter.y, @starfighter.rotation
+		end
+
 		@starfighter.move
+		@bullet.move if @bullet
 	end
 
 	def button_down(id)
-		if id == Gosu::KbEscape
-			exit
-		end
+		exit if id == Gosu::KbEscape
 	end
 end
 
 class StarFighter
+	attr_accessor :x
+	attr_accessor :y
+	attr_accessor :rotation
+
 	def initialize(window)
 		@x, @y, @rotation = 100, 100, 0
 		@movement_x, @movement_y = 0, 0
@@ -66,6 +75,29 @@ class StarFighter
 		@image.draw_rot(@x, @y, 0, @rotation)
 	end
 end
+
+class Bullet
+	MOVEMENT = 50
+
+	def initialize window, x, y, rotation
+		@x, @y, @rotation = x, y, rotation
+		@window = window
+	end
+
+	def move
+		@x += Gosu::offset_x(@rotation, MOVEMENT)
+		@y += Gosu::offset_y(@rotation, MOVEMENT)
+	end
+
+	def draw
+		color = Gosu::Color.new 0xffff8888
+		@window.draw_quad(@x, @y, color, @x + 5, @y, color, @x + 5, @y + 5, color, @x, @y + 5, color)
+		# puts "Drawing Quad: #{@x} #{@y}"
+	end
+end
+
+
+
 
 window = GameWindow.new
 window.show
