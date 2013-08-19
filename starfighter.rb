@@ -44,7 +44,6 @@ class GameWindow < Gosu::Window
 			@bullets.push bullet
 		end
 
-		@starfighter.move
 		for bullet in @bullets
 			bullet.move
 			if bullet.is_offscreen?
@@ -53,11 +52,24 @@ class GameWindow < Gosu::Window
 		end
 
 		for asteroid in @asteroids
-			if asteroid.touched? @bullets
+			if asteroid.touched? @bullets, 5
 				@asteroids.delete asteroid
 			end
+
+			if asteroid.touched? [@starfighter], 80
+				@starfighter.x = rand(WIDTH)
+				@starfighter.y = rand(HEIGHT)
+			end
+
 			asteroid.move
 		end
+
+		if rand(100) < 10
+			asteroid = Asteroid.new self
+			@asteroids.push asteroid
+		end
+
+		@starfighter.move		
 	end
 
 	def button_down(id)
@@ -152,9 +164,9 @@ class Asteroid
 		@window.draw_quad(@x, @y, color, @x + SIZE, @y, color, @x + SIZE, @y + SIZE, color, @x, @y + SIZE, color)
 	end
 
-	def touched? items
+	def touched? items, min_distance
 		for item in items
-			if Gosu::distance(item.x, item.y, @x, @y) < SIZE
+			if Gosu::distance(item.x, item.y, @x, @y) < min_distance
 				return true
 			end
 		end
