@@ -48,14 +48,16 @@ class GameWindow < Gosu::Window
 		for bullet in @bullets
 			bullet.move
 			if bullet.is_offscreen?
-				@bullets.delete(bullet)
+				@bullets.delete bullet
 			end
 		end
 
-		@asteroids.each do |asteroid|  asteroid.move end
-		# for asteroid in @asteroids
-		# 	asteroid.move
-		# end
+		for asteroid in @asteroids
+			if asteroid.touched? @bullets
+				@asteroids.delete asteroid
+			end
+			asteroid.move
+		end
 	end
 
 	def button_down(id)
@@ -102,6 +104,8 @@ end
 
 class Bullet
 	MOVEMENT = 12
+	attr_accessor :x
+	attr_accessor :y
 
 	def initialize window, x, y, rotation
 		@x, @y, @rotation = x, y, rotation
@@ -146,6 +150,15 @@ class Asteroid
 	def draw
 		color = Gosu::Color.new 0x22228888
 		@window.draw_quad(@x, @y, color, @x + SIZE, @y, color, @x + SIZE, @y + SIZE, color, @x, @y + SIZE, color)
+	end
+
+	def touched? items
+		for item in items
+			if Gosu::distance(item.x, item.y, @x, @y) < SIZE
+				return true
+			end
+		end
+		return false
 	end
 end
 
