@@ -16,7 +16,7 @@ class GameWindow < Gosu::Window
 
 	def update
 		if button_down? Gosu::KbUp
-			@starfighter.accelerate
+			@starfighter.accelerate 15
 		end
 		if button_down? Gosu::KbLeft
 			@starfighter.rotate -3
@@ -37,19 +37,21 @@ end
 class StarFighter
 	def initialize(window)
 		@x, @y, @rotation = 100, 100, 0
+		@movement_x, @movement_y = 0, 0
 		@window = window
-		@acceleration = 0
 		@image = Gosu::Image.new window, 'media/Starfighter.png'
 	end
 
-	def accelerate
-		@acceleration = 10
+	def accelerate acceleration
+		@movement_x = Gosu::offset_x(@rotation, acceleration)
+		@movement_y = Gosu::offset_y(@rotation, acceleration)
 	end
 
 	def move
-		@x += Gosu::offset_x(@rotation, @acceleration)
-		@y += Gosu::offset_y(@rotation, @acceleration)
-		@acceleration *= 0.995
+		@x += @movement_x
+		@y += @movement_y
+		@movement_x *= 0.995
+		@movement_y *= 0.995
 
 		@x %= @window.width
 		@y %= @window.height
